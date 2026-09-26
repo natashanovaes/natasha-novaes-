@@ -1,1 +1,273 @@
 
+#include <stdio.h>
+
+int validarPositivo(int valor) {
+    while (valor <= 0) {
+        printf("Valor invalido! Digite novamente: ");
+        scanf("%d", &valor);
+    }
+
+    return valor;
+}
+
+int validarModalidade(int num) {
+    while (num < 1 || num > 3) {
+        printf("Digite apenas 1, 2 ou 3! Digite novamente: ");
+        scanf("%d", &num);
+    }
+
+    return num;
+}
+
+int validarProtecao(int add) {
+    while (add != 0 && add != 1) {
+        printf("Somente 1 ou 0! Digite novamente: ");
+        scanf("%d", &add);
+    }
+
+    return add;
+}
+ 
+     
+
+int main() {
+
+    int distancia, peso, modalidade, protecao, entregas = 0;
+    int tentativas, nova_tentativa, inicia, outraEntrega;
+    
+    int quantidadeEconomica = 0;
+    int quantidadeExpressa = 0;
+    int quantidadePrioritaria = 0;
+
+    float Subtotal, adicionalPeso, totalad, adicionalModalidade, adicionalProtecao, adicionalTentativas = 0;
+    float maiorValor, menorValor, total = 0, media;
+    
+    
+    printf("Central de Atendimento. Deseja iniciar a sessao? (1) Sim | (0) Nao.\n");
+    scanf("%d", &inicia);
+
+
+    if (inicia == 1) {
+    	
+		outraEntrega = 1;
+
+        while (outraEntrega == 1) {
+
+        printf("\nSessao iniciada (Entregas)!\n");
+        printf("Por favor complete os dados abaixo:\n\n");
+
+        
+
+        printf("Distancia: ");
+        scanf("%d", &distancia);
+        distancia = validarPositivo(distancia);
+
+
+        printf("Peso: ");
+        scanf("%d", &peso);
+        peso = validarPositivo(peso);
+
+
+        printf("Selecione a modalidade de entrega:\n");
+        printf("(1) Economica | (2) Expressa | (3) Prioritaria: ");
+        scanf("%d", &modalidade);
+        modalidade = validarModalidade(modalidade);
+
+
+        printf("Contratar o servico adicional de protecao?\n");
+        printf("(1) Sim | (0) Nao: ");
+        scanf("%d", &protecao);
+        protecao = validarProtecao(protecao);
+
+
+        printf("Tentativas adicionais: ");
+        scanf("%d", &tentativas);
+        
+        
+
+        while (tentativas < 0) {
+            printf("Valor invalido! Digite novamente: ");
+            scanf("%d", &tentativas);
+        }
+
+
+        /* CALCULO DO SUBTOTAL PELA DISTANCIA */
+
+        if (distancia > 0 && distancia <= 5) {
+
+            Subtotal = 8.00 + (distancia * 1.20);
+
+        } 
+        else if (distancia > 5 && distancia <= 15) {
+
+            Subtotal = 12.00 + (distancia * 1.20);
+
+        } 
+        else if (distancia > 15 && distancia <= 30) {
+
+            Subtotal = 18.00 + (distancia * 1.20);
+
+        } 
+        else {
+
+            Subtotal = 25.00 + (distancia * 1.20);
+
+        }
+
+
+        /* CALCULO DO ADICIONAL PELO PESO */
+
+        if (peso <= 2) {
+
+            adicionalPeso = 0.00;
+
+        } 
+        else if (peso <= 5) {
+
+            adicionalPeso = Subtotal * 0.05;
+
+        } 
+        else if (peso <= 10) {
+
+            adicionalPeso = Subtotal * 0.10;
+
+        } 
+        else {
+
+            adicionalPeso = Subtotal * 0.20;
+
+        }
+
+        
+        /* CALCULO DA MODALIDADE */
+        
+        if(modalidade == 1){
+        	
+           adicionalModalidade = 0.00;
+           quantidadeEconomica++;
+		}
+        
+        else if (modalidade == 2){
+        	
+           adicionalModalidade = Subtotal * 0.15;
+           quantidadeExpressa++;
+           
+		}
+        	
+        else if(modalidade == 3){
+        	
+           adicionalModalidade = Subtotal * 0.30;
+           quantidadePrioritaria++;
+		}	
+		
+		 /* CALCULO DA Prote��o ADD */
+        
+		if(protecao == 1){
+			
+		  adicionalProtecao = 7.50;
+		}
+		
+		else{
+			
+		  adicionalProtecao = 0.00;
+		}	
+        	  
+         /* CALCULO DAS TENTATIVAS ADD */
+         
+         
+        adicionalTentativas = tentativas * 4.00;
+
+      
+        
+    
+        
+        
+        /* TOTAL */
+
+        totalad = Subtotal + adicionalPeso + adicionalModalidade + adicionalProtecao + adicionalTentativas;
+
+         
+         
+       /* CONTIDADES RESUMO*/
+         total = total + totalad;
+         media = total / entregas;
+       
+             entregas++;
+
+        if (entregas == 1) {
+       maiorValor = totalad;
+       menorValor = totalad;
+      }
+       else {
+       if (totalad > maiorValor) {
+        maiorValor = totalad;
+      }
+
+      if (totalad < menorValor) {
+        menorValor = totalad;
+     }
+    }
+         
+        /* RESUMO FINAL */
+        
+        
+         printf("Total de entrega: R$ %.2f\n", totalad);
+        printf("-----------------------------\n");
+        
+        
+        printf("-----------------------------\n");
+        printf("Deseja processar outra entrega? (1) Sim | (0) Nao.\n ");
+        scanf("%d", &outraEntrega);
+          
+		  
+		while (outraEntrega != 0 && outraEntrega != 1) {
+        printf("Somente 1 ou 0! Digite novamente: ");
+        scanf("%d", &outraEntrega);
+       }
+        
+        
+        
+        
+        
+        
+        
+        
+        }
+
+        if (outraEntrega == 0) {
+
+        printf("\n========== RESUMO FINAL ==========\n");
+       
+        printf("-----------------------------\n");
+        printf("Quantidade de Entregas: %d\n", entregas);
+        
+        printf("Valor total calculado na sess�o: R$ %.2f\n", total);
+        
+        printf("Valor m�dio das entregas: R$ %.2f\n", total / entregas);
+        
+        printf("Quantidade de Economica: %d\n", quantidadeEconomica);
+        printf("Quantidade de Expressa: %d\n", quantidadeExpressa);
+        printf("Quantidade de Prioritarias: %d\n", quantidadePrioritaria);
+        
+        printf("Maior valor de Entrega: R$ %.2f\n", maiorValor);
+        printf("Menor valor de Entrega: R$ %.2f\n", menorValor);
+              
+        }
+            
+    } 
+    
+    else if (inicia == 0) {
+
+        printf("Sessao encerrada!\n");
+
+    } 
+    else {
+
+        printf("Opcao invalida!\n");
+
+    }
+
+
+
+    return 0;
+}

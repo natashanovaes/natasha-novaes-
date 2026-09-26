@@ -56,4 +56,7 @@ a finalidade, o que foi aproveitado e o que você alterou/ajustou depois
 de compreender o código.]
 
 ## Fontes consultadas
-[Registre aqui outras fontes externas, se houver.]
+
+* Materiais e conteúdos disponibilizados pelo professor na disciplina de Lógica de Programação e Algoritmos.
+* Documentação e materiais de referência sobre a linguagem C, quando necessário.
+* Foi utilizado o Excel para realizar o teste de mesa de todos os cálculos.

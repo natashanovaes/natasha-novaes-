@@ -50,10 +50,10 @@ gcc -Wall -o simulador src/main.c
 ```
 
 ## Uso de Inteligência Artificial
-[Preencha com a declaração correspondente ao seu caso real, conforme o
+Preencha com a declaração correspondente ao seu caso real, conforme o
 roteiro. Se você usou esta conversa como apoio, descreva a ferramenta,
 a finalidade, o que foi aproveitado e o que você alterou/ajustou depois
-de compreender o código.]
+de compreender o código.
 
 ## Fontes consultadas
 

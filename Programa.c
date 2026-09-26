@@ -1,292 +1,272 @@
-/*
- * Trabalho B1 - Logica de Programacao e Algoritmos
- * Simulador de Entregas
- *
- * Programa que processa solicitacoes de entrega, calcula o valor de
- * cada uma conforme as regras de negocio do roteiro e apresenta um
- * resumo da sessao ao final.
- */
-
 #include <stdio.h>
 
-/* ----------------------- Constantes do dominio ----------------------- */
-
-#define TARIFA_POR_KM        1.20f
-#define VALOR_PROTECAO       7.50f
-#define VALOR_TENTATIVA      4.00f
-
-#define BASE_ATE_5KM         8.00f
-#define BASE_ATE_15KM        12.00f
-#define BASE_ATE_30KM        18.00f
-#define BASE_ACIMA_30KM      25.00f
-
-#define PERC_PESO_FAIXA1     0.00f   /* ate 2 kg            */
-#define PERC_PESO_FAIXA2     0.05f   /* acima de 2 ate 5 kg  */
-#define PERC_PESO_FAIXA3     0.10f   /* acima de 5 ate 10 kg */
-#define PERC_PESO_FAIXA4     0.20f   /* acima de 10 kg       */
-
-#define PERC_MOD_ECONOMICA   0.00f
-#define PERC_MOD_EXPRESSA    0.15f
-#define PERC_MOD_PRIORITARIA 0.30f
-
-#define MOD_ECONOMICA        1
-#define MOD_EXPRESSA         2
-#define MOD_PRIORITARIA      3
-
-/* --------------------- Prototipos das funcoes ------------------------ */
-
-float lerDistanciaValida(void);
-float lerPesoValido(void);
-int   lerModalidadeValida(void);
-int   lerProtecaoValida(void);
-int   lerTentativasValidas(void);
-int   lerContinuarValido(void);
-
-float obterValorBaseDistancia(float distancia);
-float calcularSubtotalInicial(float distancia);
-float obterPercentualPeso(float peso);
-float obterPercentualModalidade(int modalidade);
-float calcularValorFinal(float subtotal, float percentualPeso,
-                          float percentualModalidade, int protecao,
-                          int tentativasAdicionais);
-
-void exibirResultadoEntrega(float subtotal, float valorFinal);
-void exibirResumoFinal(int totalEntregas, float valorTotal, float valorMedio,
-                        int qtdEconomica, int qtdExpressa, int qtdPrioritaria,
-                        float maiorValor, float menorValor);
-
-/* ------------------------------ main ---------------------------------- */
-
-int main(void) {
-    int continuar;
-
-    int totalEntregas = 0;
-    float valorTotalSessao = 0.0f;
-    float maiorValor = 0.0f;
-    float menorValor = 0.0f;
-
-    int qtdEconomica = 0;
-    int qtdExpressa = 0;
-    int qtdPrioritaria = 0;
-
-    printf("=== Simulador de Entregas ===\n\n");
-
-    do {
-        float distancia = lerDistanciaValida();
-        float peso = lerPesoValido();
-        int modalidade = lerModalidadeValida();
-        int protecao = lerProtecaoValida();
-        int tentativas = lerTentativasValidas();
-
-        float subtotal = calcularSubtotalInicial(distancia);
-        float percentualPeso = obterPercentualPeso(peso);
-        float percentualModalidade = obterPercentualModalidade(modalidade);
-
-        float valorFinal = calcularValorFinal(subtotal, percentualPeso,
-                                               percentualModalidade,
-                                               protecao, tentativas);
-
-        exibirResultadoEntrega(subtotal, valorFinal);
-
-        /* Atualiza contadores e acumuladores do resumo */
-        totalEntregas = totalEntregas + 1;
-        valorTotalSessao = valorTotalSessao + valorFinal;
-
-        if (totalEntregas == 1) {
-            maiorValor = valorFinal;
-            menorValor = valorFinal;
-        } else {
-            if (valorFinal > maiorValor) {
-                maiorValor = valorFinal;
-            }
-            if (valorFinal < menorValor) {
-                menorValor = valorFinal;
-            }
-        }
-
-        if (modalidade == MOD_ECONOMICA) {
-            qtdEconomica = qtdEconomica + 1;
-        } else if (modalidade == MOD_EXPRESSA) {
-            qtdExpressa = qtdExpressa + 1;
-        } else {
-            qtdPrioritaria = qtdPrioritaria + 1;
-        }
-
-        printf("\n");
-        continuar = lerContinuarValido();
-        printf("\n");
-
-    } while (continuar == 1);
-
-    if (totalEntregas > 0) {
-        float valorMedio = valorTotalSessao / totalEntregas;
-        exibirResumoFinal(totalEntregas, valorTotalSessao, valorMedio,
-                           qtdEconomica, qtdExpressa, qtdPrioritaria,
-                           maiorValor, menorValor);
-    } else {
-        printf("Nenhuma entrega foi processada nesta sessao.\n");
+int validarPositivo(int valor) {
+    while (valor <= 0) {
+        printf("Valor invalido! Digite novamente: ");
+        scanf("%d", &valor);
     }
+
+    return valor;
+}
+
+int validarModalidade(int num) {
+    while (num < 1 || num > 3) {
+        printf("Digite apenas 1, 2 ou 3! Digite novamente: ");
+        scanf("%d", &num);
+    }
+
+    return num;
+}
+
+int validarProtecao(int add) {
+    while (add != 0 && add != 1) {
+        printf("Somente 1 ou 0! Digite novamente: ");
+        scanf("%d", &add);
+    }
+
+    return add;
+}
+ 
+     
+
+int main() {
+
+    int distancia, peso, modalidade, protecao, entregas = 0;
+    int tentativas, nova_tentativa, inicia, outraEntrega;
+    
+    int quantidadeEconomica = 0;
+    int quantidadeExpressa = 0;
+    int quantidadePrioritaria = 0;
+
+    float Subtotal, adicionalPeso, totalad, adicionalModalidade, adicionalProtecao, adicionalTentativas = 0;
+    float maiorValor, menorValor, total = 0, media;
+    
+    
+    printf("Central de Atendimento. Deseja iniciar a sessao? (1) Sim | (0) Nao.\n");
+    scanf("%d", &inicia);
+
+
+    if (inicia == 1) {
+    	
+		outraEntrega = 1;
+
+        while (outraEntrega == 1) {
+
+        printf("\nSessao iniciada (Entregas)!\n");
+        printf("Por favor complete os dados abaixo:\n\n");
+
+        
+
+        printf("Distancia: ");
+        scanf("%d", &distancia);
+        distancia = validarPositivo(distancia);
+
+
+        printf("Peso: ");
+        scanf("%d", &peso);
+        peso = validarPositivo(peso);
+
+
+        printf("Selecione a modalidade de entrega:\n");
+        printf("(1) Economica | (2) Expressa | (3) Prioritaria: ");
+        scanf("%d", &modalidade);
+        modalidade = validarModalidade(modalidade);
+
+
+        printf("Contratar o servico adicional de protecao?\n");
+        printf("(1) Sim | (0) Nao: ");
+        scanf("%d", &protecao);
+        protecao = validarProtecao(protecao);
+
+
+        printf("Tentativas adicionais: ");
+        scanf("%d", &tentativas);
+        
+        
+
+        while (tentativas < 0) {
+            printf("Valor invalido! Digite novamente: ");
+            scanf("%d", &tentativas);
+        }
+
+
+        /* CALCULO DO SUBTOTAL PELA DISTANCIA */
+
+        if (distancia > 0 && distancia <= 5) {
+
+            Subtotal = 8.00 + (distancia * 1.20);
+
+        } 
+        else if (distancia > 5 && distancia <= 15) {
+
+            Subtotal = 12.00 + (distancia * 1.20);
+
+        } 
+        else if (distancia > 15 && distancia <= 30) {
+
+            Subtotal = 18.00 + (distancia * 1.20);
+
+        } 
+        else {
+
+            Subtotal = 25.00 + (distancia * 1.20);
+
+        }
+
+
+        /* CALCULO DO ADICIONAL PELO PESO */
+
+        if (peso <= 2) {
+
+            adicionalPeso = 0.00;
+
+        } 
+        else if (peso <= 5) {
+
+            adicionalPeso = Subtotal * 0.05;
+
+        } 
+        else if (peso <= 10) {
+
+            adicionalPeso = Subtotal * 0.10;
+
+        } 
+        else {
+
+            adicionalPeso = Subtotal * 0.20;
+
+        }
+
+        
+        /* CALCULO DA MODALIDADE */
+        
+        if(modalidade == 1){
+        	
+           adicionalModalidade = 0.00;
+           quantidadeEconomica++;
+		}
+        
+        else if (modalidade == 2){
+        	
+           adicionalModalidade = Subtotal * 0.15;
+           quantidadeExpressa++;
+           
+		}
+        	
+        else if(modalidade == 3){
+        	
+           adicionalModalidade = Subtotal * 0.30;
+           quantidadePrioritaria++;
+		}	
+		
+		 /* CALCULO DA Prote��o ADD */
+        
+		if(protecao == 1){
+			
+		  adicionalProtecao = 7.50;
+		}
+		
+		else{
+			
+		  adicionalProtecao = 0.00;
+		}	
+        	  
+         /* CALCULO DAS TENTATIVAS ADD */
+         
+         
+        adicionalTentativas = tentativas * 4.00;
+
+      
+        
+    
+        
+        
+        /* TOTAL */
+
+        totalad = Subtotal + adicionalPeso + adicionalModalidade + adicionalProtecao + adicionalTentativas;
+
+         
+         
+       /* CONTIDADES RESUMO*/
+         total = total + totalad;
+         media = total / entregas;
+       
+             entregas++;
+
+        if (entregas == 1) {
+       maiorValor = totalad;
+       menorValor = totalad;
+      }
+       else {
+       if (totalad > maiorValor) {
+        maiorValor = totalad;
+      }
+
+      if (totalad < menorValor) {
+        menorValor = totalad;
+     }
+    }
+         
+        /* RESUMO FINAL */
+        
+        
+         printf("Total de entrega: R$ %.2f\n", totalad);
+        printf("-----------------------------\n");
+        
+        
+        printf("-----------------------------\n");
+        printf("Deseja processar outra entrega? (1) Sim | (0) Nao.\n ");
+        scanf("%d", &outraEntrega);
+          
+		  
+		while (outraEntrega != 0 && outraEntrega != 1) {
+        printf("Somente 1 ou 0! Digite novamente: ");
+        scanf("%d", &outraEntrega);
+       }
+        
+        
+        
+        
+        
+        
+        
+        
+        }
+
+        if (outraEntrega == 0) {
+
+        printf("\n========== RESUMO FINAL ==========\n");
+       
+        printf("-----------------------------\n");
+        printf("Quantidade de Entregas: %d\n", entregas);
+        
+        printf("Valor total calculado na sess�o: R$ %.2f\n", total);
+        
+        printf("Valor m�dio das entregas: R$ %.2f\n", total / entregas);
+        
+        printf("Quantidade de Economica: %d\n", quantidadeEconomica);
+        printf("Quantidade de Expressa: %d\n", quantidadeExpressa);
+        printf("Quantidade de Prioritarias: %d\n", quantidadePrioritaria);
+        
+        printf("Maior valor de Entrega: R$ %.2f\n", maiorValor);
+        printf("Menor valor de Entrega: R$ %.2f\n", menorValor);
+              
+        }
+            
+    } 
+    
+    else if (inicia == 0) {
+
+        printf("Sessao encerrada!\n");
+
+    } 
+    else {
+
+        printf("Opcao invalida!\n");
+
+    }
+
+
 
     return 0;
-}
-
-/* --------------------- Funcoes de leitura/validacao -------------------- */
-
-float lerDistanciaValida(void) {
-    float distancia;
-
-    printf("Distancia (km): ");
-    scanf("%f", &distancia);
-
-    while (distancia <= 0.0f) {
-        printf("Distancia invalida. Informe um valor maior que zero: ");
-        scanf("%f", &distancia);
-    }
-
-    return distancia;
-}
-
-float lerPesoValido(void) {
-    float peso;
-
-    printf("Peso (kg): ");
-    scanf("%f", &peso);
-
-    while (peso <= 0.0f) {
-        printf("Peso invalido. Informe um valor maior que zero: ");
-        scanf("%f", &peso);
-    }
-
-    return peso;
-}
-
-int lerModalidadeValida(void) {
-    int modalidade;
-
-    printf("Modalidade (1-Economica, 2-Expressa, 3-Prioritaria): ");
-    scanf("%d", &modalidade);
-
-    while (modalidade != MOD_ECONOMICA && modalidade != MOD_EXPRESSA &&
-           modalidade != MOD_PRIORITARIA) {
-        printf("Modalidade invalida. Informe 1, 2 ou 3: ");
-        scanf("%d", &modalidade);
-    }
-
-    return modalidade;
-}
-
-int lerProtecaoValida(void) {
-    int protecao;
-
-    printf("Servico de protecao (1-Sim, 0-Nao): ");
-    scanf("%d", &protecao);
-
-    while (protecao != 0 && protecao != 1) {
-        printf("Valor invalido. Informe 0 ou 1: ");
-        scanf("%d", &protecao);
-    }
-
-    return protecao;
-}
-
-int lerTentativasValidas(void) {
-    int tentativas;
-
-    printf("Quantidade de tentativas adicionais: ");
-    scanf("%d", &tentativas);
-
-    while (tentativas < 0) {
-        printf("Valor invalido. Informe um numero maior ou igual a zero: ");
-        scanf("%d", &tentativas);
-    }
-
-    return tentativas;
-}
-
-int lerContinuarValido(void) {
-    int opcao;
-
-    printf("Deseja processar outra entrega? (1-Sim, 0-Nao): ");
-    scanf("%d", &opcao);
-
-    while (opcao != 0 && opcao != 1) {
-        printf("Valor invalido. Informe 0 ou 1: ");
-        scanf("%d", &opcao);
-    }
-
-    return opcao;
-}
-
-/* --------------------------- Funcoes de calculo ------------------------ */
-
-float obterValorBaseDistancia(float distancia) {
-    if (distancia <= 5.0f) {
-        return BASE_ATE_5KM;
-    } else if (distancia <= 15.0f) {
-        return BASE_ATE_15KM;
-    } else if (distancia <= 30.0f) {
-        return BASE_ATE_30KM;
-    } else {
-        return BASE_ACIMA_30KM;
-    }
-}
-
-float calcularSubtotalInicial(float distancia) {
-    float valorBase = obterValorBaseDistancia(distancia);
-    return valorBase + (distancia * TARIFA_POR_KM);
-}
-
-float obterPercentualPeso(float peso) {
-    if (peso <= 2.0f) {
-        return PERC_PESO_FAIXA1;
-    } else if (peso <= 5.0f) {
-        return PERC_PESO_FAIXA2;
-    } else if (peso <= 10.0f) {
-        return PERC_PESO_FAIXA3;
-    } else {
-        return PERC_PESO_FAIXA4;
-    }
-}
-
-float obterPercentualModalidade(int modalidade) {
-    if (modalidade == MOD_ECONOMICA) {
-        return PERC_MOD_ECONOMICA;
-    } else if (modalidade == MOD_EXPRESSA) {
-        return PERC_MOD_EXPRESSA;
-    } else {
-        return PERC_MOD_PRIORITARIA;
-    }
-}
-
-float calcularValorFinal(float subtotal, float percentualPeso,
-                          float percentualModalidade, int protecao,
-                          int tentativasAdicionais) {
-    float adicionalPeso = subtotal * percentualPeso;
-    float adicionalModalidade = subtotal * percentualModalidade;
-    float adicionalProtecao = (protecao == 1) ? VALOR_PROTECAO : 0.0f;
-    float adicionalTentativas = tentativasAdicionais * VALOR_TENTATIVA;
-
-    return subtotal + adicionalPeso + adicionalModalidade +
-           adicionalProtecao + adicionalTentativas;
-}
-
-/* --------------------------- Funcoes de saida --------------------------- */
-
-void exibirResultadoEntrega(float subtotal, float valorFinal) {
-    printf("Subtotal inicial: R$ %.2f\n", subtotal);
-    printf("Valor final da entrega: R$ %.2f\n", valorFinal);
-}
-
-void exibirResumoFinal(int totalEntregas, float valorTotal, float valorMedio,
-                        int qtdEconomica, int qtdExpressa, int qtdPrioritaria,
-                        float maiorValor, float menorValor) {
-    printf("=== Resumo da sessao ===\n");
-    printf("Total de entregas processadas: %d\n", totalEntregas);
-    printf("Valor total da sessao: R$ %.2f\n", valorTotal);
-    printf("Valor medio das entregas: R$ %.2f\n", valorMedio);
-    printf("Entregas Economicas: %d\n", qtdEconomica);
-    printf("Entregas Expressas: %d\n", qtdExpressa);
-    printf("Entregas Prioritarias: %d\n", qtdPrioritaria);
-    printf("Maior valor de entrega: R$ %.2f\n", maiorValor);
-    printf("Menor valor de entrega: R$ %.2f\n", menorValor);
 }
